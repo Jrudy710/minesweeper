@@ -35,12 +35,16 @@ public class gameBoard{                                                         
    public String[][] gameBoard;                                                                                // INSTANCE VARIABLE 
    public String[][] secretBoard;                                                                              // INSTANCE VARIABLE
    public String[][] singleReversion;                                                                          // INSTANCE VARIABLE
+   private boolean firstSelection;                                                                             // INSTANCE VARIABLE
+   private int revealedPieces;                                                                                 // INSTANCE VARIABLE
+   private int numMines;                                                                                       // INSTANCE VARIABLE
       
    public gameBoard(int row, int column){                                                                      // Argument Constructor
    
       gameBoard = new String[row][column];                                                                     // Initializes gamesBoard
       secretBoard = new String[row][column];                                                                   // Initializes secretBoard
       singleReversion = new String[row][column];                                                               // Initializes singleReversion
+      firstSelection = true;                                                                                   // Initializes firstSelection
       
       initBoards();                                                                                            // Call to method initBoards
    }
@@ -50,6 +54,7 @@ public class gameBoard{                                                         
       gameBoard = new String[8][10];                                                                           // Initializes gamesBoard
       secretBoard = new String[8][10];                                                                         // Initializes secretBoard
       singleReversion = new String[8][10];                                                                     // Initializes singleReversion
+      firstSelection = true;                                                                                   // Initializes firstSelection
       
       initBoards();                                                                                            // Call to method initBoards
    }
@@ -102,6 +107,8 @@ public class gameBoard{                                                         
    public void fillSecretBoard(){                                                                              // Setter Method
       
                                                                                                                // VARIABLE DEFINITIONS
+      // This will eventually be done with a method that will be called 
+      // during the first time that a player selection is done.
       String flagPositions[] = {"a7", "b7", "c5", "c8", "d2", "f3", "f8", "f9", "g2", "h5"};                   // Defines flagPositions
       
       int LCV = 0;                                                                                             // Defines LCV
