@@ -3,7 +3,7 @@ package minesweeper;
 public class MinesweeperTester{                                                                                // Class Block
    public static void main(String[] args){                                                                     // Method Block
       
-      gameBoard theGame = new gameBoard();
+      gameBoard theGame = new gameBoard(14, 18);
       
       int count = 0;
       
