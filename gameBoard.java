@@ -35,9 +35,12 @@ public class gameBoard{                                                         
    public String[][] gameBoard;                                                                                // INSTANCE VARIABLE 
    public String[][] secretBoard;                                                                              // INSTANCE VARIABLE
    public String[][] singleReversion;                                                                          // INSTANCE VARIABLE
+   
    private boolean firstSelection;                                                                             // INSTANCE VARIABLE
-   private int revealedPieces;                                                                                 // INSTANCE VARIABLE
-   private int numMines;                                                                                       // INSTANCE VARIABLE
+   
+   public int revealedPieces;                                                                                 // INSTANCE VARIABLE
+   public int reversionPieces;                                                                                // INSTANCE VARIABLE
+   public int numMines;                                                                                       // INSTANCE VARIABLE
       
    public gameBoard(int row, int column){                                                                      // Argument Constructor
    
@@ -45,6 +48,19 @@ public class gameBoard{                                                         
       secretBoard = new String[row][column];                                                                   // Initializes secretBoard
       singleReversion = new String[row][column];                                                               // Initializes singleReversion
       firstSelection = true;                                                                                   // Initializes firstSelection
+      
+      revealedPieces = 0;                                                                                      // Initializes revealedPieces
+      reversionPieces = 0;                                                                                     // Iniitializes reversionPieces
+      
+      if(row == 8 && column == 10){                                                                            // Conditional on what value to set numMines to
+         numMines = 10;                                                                                        // Initializes numMines
+      }
+      else if(row == 14 && column == 18){                                                                      // Else If statement
+         numMines = 40;                                                                                        // Initializes numMines
+      }
+      else{                                                                                                    // Else Statement
+         numMines = 8;                                                                                         // Initializes numMines
+      }
       
       initBoards();                                                                                            // Call to method initBoards
    }
@@ -55,6 +71,10 @@ public class gameBoard{                                                         
       secretBoard = new String[8][10];                                                                         // Initializes secretBoard
       singleReversion = new String[8][10];                                                                     // Initializes singleReversion
       firstSelection = true;                                                                                   // Initializes firstSelection
+      
+      revealedPieces = 0;                                                                                      // Initializes revealedPieces
+      reversionPieces = 0;                                                                                     // Initializes reversionPieces
+      numMines = 10;                                                                                           // Initializes numMines
       
       initBoards();                                                                                            // Call to method initBoards
    }
@@ -259,7 +279,7 @@ public class gameBoard{                                                         
          flagPlacementTime();                                                                                  // Call to method flagPlacementTime
       }
       else{                                                                                                    // If the user entered a valid coordinate
-         coordinatesToReveal.add(coordinate);                                                                  // Adds to the arrayList coordinatesToReveal
+         coordinatesToReveal.add(coordinate);                                                                  // Adds to the arrayList coordinatesToReveal         
          makeTheSame(true);                                                                                    // Call to method makeTheSame   
          revealSurroundings(coordinatesToReveal);                                                              // Call to Method revealSurroundings
       }
@@ -345,7 +365,15 @@ public class gameBoard{                                                         
             }
          }
       }
+      
+      if(!originalWay){                                                                                        // If statement
+         revealedPieces = reversionPieces;                                                                     // Sets the value of revealedPieces
+      }  
+      else{                                                                                                    // Else statement
+         reversionPieces = revealedPieces;                                                                     // Sets the value of reversionPieces
+      }
    }
+   
    
    
    
@@ -370,6 +398,7 @@ public class gameBoard{                                                         
       }
       return true;                                                                                             // Returns true to the user
    }
+
    
    
    
@@ -410,14 +439,25 @@ public class gameBoard{                                                         
                   }
                }
             }
+            
+            // Might accidentally encounter mines when expanding. Will have to redundancy check to make sure
+            // this is not the case
+            if(secretBoard[row][column].equals("M") && !gameBoard[row][column].equals("F")){                   // If the user accidentally encountered a mine
+               revealedPieces = gameBoard.length * gameBoard[0].length;                                        // Sets the value of revealedPieces
+               System.out.println("\nYou have hit a mine!!!");                                                 // Prints out to the user
+               gameBoard[row][column] = secretBoard[row][column];                                              // Sets the value in gameBoard at the index of row and column
+               break;                                                                                          // Breaks out of the while loop
+            }
             if(gameBoard[row][column].equals("*")){
                gameBoard[row][column] = secretBoard[row][column];                                              // Sets the value in gameBoard at the index of row and column
+               revealedPieces += 1;                                                                            // Adds to the value of revealedPieces
             }
          }
       }
       
       
    }
+   
    
    
    
@@ -477,6 +517,7 @@ public class gameBoard{                                                         
       }
       return true;                                                                                             // Returns true to the user
    }
+   
    
    
    
@@ -572,8 +613,28 @@ public class gameBoard{                                                         
       for(column = 0; column < theBoard[0].length; column++){                                                  // For Loop
          System.out.printf(" %3d", column);                                                                    // Prints the formatted information
       }
-      
+      System.out.printf("\nNumber of pieces revealed: %d", revealedPieces);
+      System.out.printf("\nNumber of mines: %d", numMines);
       System.out.println();                                                                                    // Prints the newline character
+   }
+   
+   
+   
+   
+   /*
+      * This is the method that will be used to determine if the game has been won by the user. 
+      * This will be done by revealing all of the pieces on the board and not necessarily having
+      * to have all the flags placed on the board. The main condition to win minesweeper is revealing all of the places the mines aren't
+   */
+   public boolean gameOver(){                                                                                  // Method Block
+      
+      if(numMines + revealedPieces >= (gameBoard.length * gameBoard[0].length)){                               // If statement
+         return true;                                                                                          // Returns true to the user
+      }
+      else{                                                                                                    // Else statement
+         return false;                                                                                         // Returns false to the user
+      }
+      
    }
    
    
