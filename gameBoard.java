@@ -23,6 +23,10 @@
    * the game is over and how the player can place flags on the board
 * 6/5/2024 - Found and fixed a bug if the user were to enter in a phrase that was not recognized by the placeSelection method. 
    * Also created the necessary methods to now allow for flags to be placed on the board by the user.
+* 6/18/2024 - Have the barest of skeletons for the program done. A user can now play a game of minesweeper to completion, even if
+   * the coordinates for mines are hard coded right now, and they will win or lose. 
+   * The instructions for the game still need to be provided to the user so that they know how to play but that is a 5 second fix to do.
+* 6/21/2024 - Added the inital setter and getter methods needed to make the random mine selection on the board.
 */
 package minesweeper;
 
@@ -38,9 +42,10 @@ public class gameBoard{                                                         
    
    private boolean firstSelection;                                                                             // INSTANCE VARIABLE
    
-   public int revealedPieces;                                                                                 // INSTANCE VARIABLE
-   public int reversionPieces;                                                                                // INSTANCE VARIABLE
-   public int numMines;                                                                                       // INSTANCE VARIABLE
+   public int revealedPieces;                                                                                  // INSTANCE VARIABLE
+   public int reversionPieces;                                                                                 // INSTANCE VARIABLE
+   public int numMines;                                                                                        // INSTANCE VARIABLE
+   public int flagsAdded;                                                                                      // INSTANCE VARIABLE
       
    public gameBoard(int row, int column){                                                                      // Argument Constructor
    
@@ -54,12 +59,15 @@ public class gameBoard{                                                         
       
       if(row == 8 && column == 10){                                                                            // Conditional on what value to set numMines to
          numMines = 10;                                                                                        // Initializes numMines
+         flagsAdded = 10;                                                                                      // Initializes flagsAdded
       }
       else if(row == 14 && column == 18){                                                                      // Else If statement
          numMines = 40;                                                                                        // Initializes numMines
+         flagsAdded = 40;                                                                                      // Initializes flagsAdded
       }
       else{                                                                                                    // Else Statement
          numMines = 8;                                                                                         // Initializes numMines
+         flagsAdded = 8;                                                                                       // Initializes flagsAdded
       }
       
       initBoards();                                                                                            // Call to method initBoards
@@ -75,6 +83,7 @@ public class gameBoard{                                                         
       revealedPieces = 0;                                                                                      // Initializes revealedPieces
       reversionPieces = 0;                                                                                     // Initializes reversionPieces
       numMines = 10;                                                                                           // Initializes numMines
+      flagsAdded = 10;                                                                                         // Initializes flagsAdded
       
       initBoards();                                                                                            // Call to method initBoards
    }
@@ -92,7 +101,10 @@ public class gameBoard{                                                         
    public void initBoards(){                                                                                   // Setter Method
       
       fillGameBoard();                                                                                         // Call to method fillGameBoard
-      fillSecretBoard();                                                                                       // Call to method fillSecretBoard
+      
+      // This has been changed to be activated once the first coordinate has been chosen
+      //fillSecretBoard();                                                                                     // Call to method fillSecretBoard
+      
       makeTheSame(true);                                                                                       // Fills the singleReversion board
    }
    
@@ -124,20 +136,45 @@ public class gameBoard{                                                         
       * For the moment, until the process has been double, triple, and quadruple 
       * checked, the flag positions will be hard coded to ensure the method works correctly.
    */
-   public void fillSecretBoard(){                                                                              // Setter Method
+   public void fillSecretBoard(String coordinate){                                                             // Setter Method
       
                                                                                                                // VARIABLE DEFINITIONS
       // This will eventually be done with a method that will be called 
       // during the first time that a player selection is done.
-      String flagPositions[] = {"a7", "b7", "c5", "c8", "d2", "f3", "f8", "f9", "g2", "h5"};                   // Defines flagPositions
-      
+      String flagPositions[] = {"a7", "b7", "c5", "c8", "d2", "f3", "f8", "f9", "g2", "h5"};                 // Defines flagPositions
+      //String flagPositions[this.numMines] = new String[this.numMines];                                         // Defines flagPositions
+            
       int LCV = 0;                                                                                             // Defines LCV
       int row = 0;                                                                                             // Defines row
       int column = 0;                                                                                          // Defines column
       
+      for(row = 
+      
+      row = getCoordinate(coordinate, true);                                                                   // Sets the value of row
+      column = getCoordinate(coordinate, false);                                                               // Sets the value of column
+      
+      
+      String checkPositions[] = {makeCoordinate(row - 1, column - 1), makeCoordinate(row - 1, column), makeCoordinate(row - 1, column + 1), 
+                                 makeCoordinate(row, column - 1), makeCoordinate(row, column + 1), coordinate,
+                                 makeCoordinate(row + 1, column - 1), makeCoordinate(row + 1, column), makeCoordinate(row + 1, column + 1)
+      };
+      
+      
       
       /*
-         * For each loop to add the flags to secretBoard
+         * Very similiar to the block of code in the surroundingFlags method
+      */
+      for(String position: checkPositions){                                                                    // Foreach Loop
+         if(possiblyValid(position)){                                                                          // Checking to make sure the position is valid
+            //System.out.printf("Will look at position: %s\n", position);                                      // Debug print statement
+            
+         }
+      }
+      
+      
+      
+      /*
+         * For each loop to add the mines to secretBoard
       */
       for(String singularFlag: flagPositions){                                                                 // For-each Loop
          
@@ -327,9 +364,11 @@ public class gameBoard{                                                         
             
             if(gameBoard[row][column].equals("F")){                                                            // If the value at the index of row and column already has a flag
                gameBoard[row][column] = "*";                                                                   // Sets the value of gameboard at the index of row and column
+               flagsAdded += 1;                                                                                // Adds to the value of flagsAdded
             }
             else if(gameBoard[row][column].equals("*")){                                                       // If the value at the index of row and column has not been revealed
                gameBoard[row][column] = "F";                                                                   // Sets the value of gameboard at the index of row and column
+               flagsAdded -= 1;                                                                                // Subtracts from the value of flagsAdded
             }
             else{
                System.out.println("You can't place a flag here");                                              // Prints out to the user
@@ -414,7 +453,10 @@ public class gameBoard{                                                         
       
       String coordinate = "";                                                                                  // Defines coordinate
       
-      
+      if(getFirstSelection()){
+         makeFalse();
+         
+      }
       
       while(theStack.size() != 0){                                                                             // Loops for as long as the stack isn't empty
          
@@ -456,6 +498,26 @@ public class gameBoard{                                                         
       }
       
       
+   }
+   
+   
+   
+   
+   /*
+      * SETTER METHOD to change the value of the private boolean firstSelection
+   */
+   public void makeFalse(){                                                                                    // SETTER METHOD
+      this.firstSelection = false;                                                                             // Sets the value of firstSelection
+   }
+   
+   
+   
+   
+   /*
+      * GETTER Method to obtain the value of the private boolean firstSelection
+   */
+   public boolean getFirstSelection(){                                                                         // GETTER METHOD
+      return firstSelection;                                                                                   // Returns the value of firstSelection
    }
    
    
@@ -543,6 +605,26 @@ public class gameBoard{                                                         
    
    
    /*
+      * This is just a method that will be used to print out the rules of the game to the user.
+   */
+   public void initialInfoDump(){
+      
+      Scanner input = new Scanner(System.in);
+      
+      System.out.println("Thank you for choosing to play the game of minesweeper. Before you begin the game there are a few rules to be made aware of for how to play the game.");
+      System.out.println("To choose a place to \"select\" on the board you must first type the letter on the left hand side of the board and then the numerical value of the column as listed on the bottom of the board. \nAn example of a coordinate selection would be \"a0\" or \"d2\".");
+      System.out.println("When it comes to placing flags on the board you must first type the word \"flag\" into the prompt and then enter the coordinate the same way you were doing before entering flag placement mode.");
+      System.out.println("When you place a flag on the board, if you try to enter the coordinate of a flag while not in flag placement mode, nothing will happen. \nIf you wish to remove a flag you have already placed on the board you must first type \"flag\" and then the coordinate of the flag.");
+      System.out.println("\nThe goal of minesweeper is to reveal all the spaces on the board without accidentally choosing a mine coordinate. If the coordinate you entered is a mine then the game will end.");
+      System.out.println("If you understand the rules of the game please press the \"Enter\" key and good luck!");
+      input.nextLine();
+      
+   }
+   
+   
+   
+   
+   /*
       * This is the method that will be used to print out the board to the user. For the forseeable future
       * the method will take in an array to be printed out so I can make sure that both gameBoard and secretBoard
       * are initialized with the correct values.
@@ -613,8 +695,8 @@ public class gameBoard{                                                         
       for(column = 0; column < theBoard[0].length; column++){                                                  // For Loop
          System.out.printf(" %3d", column);                                                                    // Prints the formatted information
       }
-      System.out.printf("\nNumber of pieces revealed: %d", revealedPieces);
-      System.out.printf("\nNumber of mines: %d", numMines);
+      //System.out.printf("\nNumber of pieces revealed: %d", revealedPieces);                                  // Debug Statement
+      System.out.printf("\nNumber of flags left to place: %d", flagsAdded);                                    // Prints out to the user
       System.out.println();                                                                                    // Prints the newline character
    }
    
