@@ -27,6 +27,8 @@
    * the coordinates for mines are hard coded right now, and they will win or lose. 
    * The instructions for the game still need to be provided to the user so that they know how to play but that is a 5 second fix to do.
 * 6/21/2024 - Added the inital setter and getter methods needed to make the random mine selection on the board.
+* 6/24/2024 - Added the method to randomly put mines onto the board based on the user's first choice of where to first look. Also found a bug that didn't
+   * place the correct number of mines onto the board. That has now been fixed.
 */
 package minesweeper;
 
@@ -141,14 +143,19 @@ public class gameBoard{                                                         
                                                                                                                // VARIABLE DEFINITIONS
       // This will eventually be done with a method that will be called 
       // during the first time that a player selection is done.
-      String flagPositions[] = {"a7", "b7", "c5", "c8", "d2", "f3", "f8", "f9", "g2", "h5"};                 // Defines flagPositions
-      //String flagPositions[this.numMines] = new String[this.numMines];                                         // Defines flagPositions
+      String[] flagPositions = new String[this.numMines];                                                      // Defines flagPositions
             
       int LCV = 0;                                                                                             // Defines LCV
       int row = 0;                                                                                             // Defines row
       int column = 0;                                                                                          // Defines column
       
-      for(row = 
+      ArrayList<String> possibleMines = new ArrayList<String>();                                               // Defines possibleMines
+      
+      for(row = 0; row < gameBoard.length; row++){                                                             // For Loop
+         for(column = 0; column < gameBoard[row].length; column++){                                            // Nested For Loop
+            possibleMines.add(makeCoordinate(row, column));                                                    // Adds to the arrayList possibleMines
+         }
+      }
       
       row = getCoordinate(coordinate, true);                                                                   // Sets the value of row
       column = getCoordinate(coordinate, false);                                                               // Sets the value of column
@@ -160,15 +167,21 @@ public class gameBoard{                                                         
       };
       
       
-      
       /*
          * Very similiar to the block of code in the surroundingFlags method
       */
       for(String position: checkPositions){                                                                    // Foreach Loop
          if(possiblyValid(position)){                                                                          // Checking to make sure the position is valid
             //System.out.printf("Will look at position: %s\n", position);                                      // Debug print statement
-            
+            possibleMines.remove(position);                                                                    // Removes the coordinate from the list of possible mines
          }
+      }
+      
+      //System.out.println(possibleMines);                                                                     // Debug print statement
+      
+      for(LCV = 0; LCV < flagPositions.length; LCV++){                                                         // For Loop
+         flagPositions[LCV] = possibleMines.remove((int)(Math.random() * possibleMines.size()));               // Sets the value of flagPositions at the index of LCV
+         
       }
       
       
@@ -454,8 +467,8 @@ public class gameBoard{                                                         
       String coordinate = "";                                                                                  // Defines coordinate
       
       if(getFirstSelection()){
-         makeFalse();
-         
+         fillSecretBoard(theStack.get(0));
+         makeFalse();  
       }
       
       while(theStack.size() != 0){                                                                             // Loops for as long as the stack isn't empty
