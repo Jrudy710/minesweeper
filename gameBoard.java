@@ -30,6 +30,7 @@
 * 6/24/2024 - Added the method to randomly put mines onto the board based on the user's first choice of where to first look. Also found a bug that didn't
    * place the correct number of mines onto the board. That has now been fixed.
 */
+
 package minesweeper;
 
 import java.util.ArrayList;                                                                                    // Imports ArrayList Libraries
@@ -361,7 +362,7 @@ public class gameBoard{                                                         
       do{                                                                                                      // Do-While Loop
          
          if(!firstTime){                                                                                       // If it is not the first time placing a flag
-            printBoard(gameBoard);                                                                             // Call to method printBoard
+            printBoard();                                                                                      // Call to method printBoard
          }
          else{                                                                                                 // Not the first time in the loop
             firstTime = false;                                                                                 // Sets the value of firstTime
@@ -663,7 +664,7 @@ public class gameBoard{                                                         
               0 1 2 3 4 5 6 7 8 9 
                        
    */
-   public void printBoard(String[][] theBoard){                                                                // Method Block
+   public void printBoard(){                                                                                   // Method Block
       
                                                                                                                // VARIABLE DEFINITIONS
       int row = 0;                                                                                             // Defines row
@@ -672,20 +673,20 @@ public class gameBoard{                                                         
       
       char rowVal = 'a';                                                                                       // Defines rowVal
       
-      for(row = 0; row < theBoard.length; row++){                                                              // For Loop
+      for(row = 0; row < gameBoard.length; row++){                                                             // For Loop
          
-         System.out.printf("\t-");                                                                              // Prints the tab character
+         System.out.printf("\t-");                                                                             // Prints the tab character
          
-         for(column = 0; column < theBoard[row].length; column++){                                             // Nested For Loop
+         for(column = 0; column < gameBoard[row].length; column++){                                            // Nested For Loop
             System.out.print("----");                                                                          // Prints out to the user
          }
          
          System.out.printf("\n%s\t|", rowVal);                                                                 // Prints out the rowVal to the user
          
-         for(column = 0; column < theBoard[row].length; column++){                                             // Nested For Loop
+         for(column = 0; column < gameBoard[row].length; column++){                                            // Nested For Loop
             
-            if(!theBoard[row][column].equals("0")){
-               System.out.printf(" %s |", theBoard[row][column]);                                              // Prints out to the user
+            if(!gameBoard[row][column].equals("0")){
+               System.out.printf(" %s |", gameBoard[row][column]);                                             // Prints out to the user
             }
             else{
                String space = " ";                                                                             // Defines space
@@ -699,13 +700,13 @@ public class gameBoard{                                                         
       
       System.out.printf("\t-");                                                                                // Prints the tab character
       
-      for(column = 0; column < theBoard[0].length; column++){                                                  // Nested For Loop
+      for(column = 0; column < gameBoard[0].length; column++){                                                 // Nested For Loop
          System.out.print("----");                                                                             // Prints out to the user
       }
       
       System.out.printf("\n  ");                                                                               // Prints out to the user
       
-      for(column = 0; column < theBoard[0].length; column++){                                                  // For Loop
+      for(column = 0; column < gameBoard[0].length; column++){                                                 // For Loop
          System.out.printf(" %3d", column);                                                                    // Prints the formatted information
       }
       //System.out.printf("\nNumber of pieces revealed: %d", revealedPieces);                                  // Debug Statement
