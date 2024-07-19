@@ -71,6 +71,10 @@ public class graphicalLogicGameBoard{                                           
          numMines = 40;                                                                                        // Initializes numMines
          flagsAdded = 40;                                                                                      // Initializes flagsAdded
       }
+      else if(row == 20 && column == 24){                                                                      // Else If statement
+         numMines = 99;                                                                                        // Initializes numMines
+         flagsAdded = 99;                                                                                      // Initializes flagsAdded
+      }
       else{                                                                                                    // Else Statement
          numMines = 8;                                                                                         // Initializes numMines
          flagsAdded = 8;                                                                                       // Initializes flagsAdded

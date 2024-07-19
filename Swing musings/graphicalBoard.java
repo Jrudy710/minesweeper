@@ -281,4 +281,5 @@ public class graphicalBoard extends graphicalLogicGameBoard{
       JOptionPane.showMessageDialog(firstMessage, theMessage);                                                                         // Displays the Message to the user      
    }
    
+   
 }
