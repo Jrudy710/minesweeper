@@ -29,6 +29,7 @@
 * 6/21/2024 - Added the inital setter and getter methods needed to make the random mine selection on the board.
 * 6/24/2024 - Added the method to randomly put mines onto the board based on the user's first choice of where to first look. Also found a bug that didn't
    * place the correct number of mines onto the board. That has now been fixed.
+* 7/19/2024 - Added in the methods to allow for graphical logic checking based on if the user hit a mine or if the user won
 */
 
 import java.util.ArrayList;                                                                                    // Imports ArrayList Libraries
@@ -42,6 +43,8 @@ public class graphicalLogicGameBoard{                                           
    public String[][] singleReversion;                                                                          // INSTANCE VARIABLE
    
    private boolean firstSelection;                                                                             // INSTANCE VARIABLE
+   private boolean hitMine;                                                                                    // INSTANCE VARIABLE
+   private boolean wonGame;                                                                                    // INSTANCE VARIABLE 
    
    public int revealedPieces;                                                                                  // INSTANCE VARIABLE
    public int reversionPieces;                                                                                 // INSTANCE VARIABLE
@@ -54,6 +57,8 @@ public class graphicalLogicGameBoard{                                           
       secretBoard = new String[row][column];                                                                   // Initializes secretBoard
       singleReversion = new String[row][column];                                                               // Initializes singleReversion
       firstSelection = true;                                                                                   // Initializes firstSelection
+      hitMine = false;                                                                                         // Initializes hitMine
+      wonGame = false;                                                                                         // initializes wonGame
       
       revealedPieces = 0;                                                                                      // Initializes revealedPieces
       reversionPieces = 0;                                                                                     // Iniitializes reversionPieces
@@ -80,6 +85,8 @@ public class graphicalLogicGameBoard{                                           
       secretBoard = new String[8][10];                                                                         // Initializes secretBoard
       singleReversion = new String[8][10];                                                                     // Initializes singleReversion
       firstSelection = true;                                                                                   // Initializes firstSelection
+      hitMine = false;                                                                                         // Initializes hitMine
+      wonGame = false;                                                                                         // initializes wonGame
       
       revealedPieces = 0;                                                                                      // Initializes revealedPieces
       reversionPieces = 0;                                                                                     // Initializes reversionPieces
@@ -269,7 +276,7 @@ public class graphicalLogicGameBoard{                                           
       if(position.length() < 2){                                                                               // Makes sure the correct coordinate was entered
          return false;                                                                                         // Returns false to the user
       }
-      System.out.println("Checking " + position);
+      //System.out.println("Checking " + position);
       row = getCoordinate(position, true);                                                                     // Sets the value of row
       column = getCoordinate(position, false);                                                                 // Sets the value of column
       
@@ -297,7 +304,7 @@ public class graphicalLogicGameBoard{                                           
       
                                                                                                                // VARIABLE DEFINITIONS
       Scanner input = new Scanner(System.in);                                                                  // New Scanner Object
-      System.out.printf("Nanu %s", chosenCoordin);
+      //System.out.printf("Nanu %s", chosenCoordin);
       
       boolean notFirstTime = true;                                                                             // Defines notFirstTime
       
@@ -325,7 +332,7 @@ public class graphicalLogicGameBoard{                                           
          }
       }
       else if(coordinate.toLowerCase().equals("flag")){                                                        // If the user chose to add a flag to the board
-         flagPlacementTime();                                                                                  // Call to method flagPlacementTime
+        // flagPlacementTime();                                                                                  // Call to method flagPlacementTime
       }
       else{                                                                                                    // If the user entered a valid coordinate
          coordinatesToReveal.add(coordinate);                                                                  // Adds to the arrayList coordinatesToReveal         
@@ -345,7 +352,7 @@ public class graphicalLogicGameBoard{                                           
       * after another as opposed to having to repeatedly go back to the original placeSelection
       * method and repeatedly go through this process.
    */
-   public void flagPlacementTime(){                                                                            // Method Block
+   public void flagPlacementTime(String theCoord){                                                             // Method Block
       
                                                                                                                // VARIABLE DEFINITIONS
       int row = 0;                                                                                             // Defines row
@@ -353,21 +360,21 @@ public class graphicalLogicGameBoard{                                           
       
       boolean firstTime = true;                                                                                // Defines firstTime
       
-      String coordinate = "";                                                                                  // Defines coordinate    
+      String coordinate = theCoord;                                                                            // Defines coordinate    
       
       Scanner input = new Scanner(System.in);                                                                  // Creates Scanner Object
       
       do{                                                                                                      // Do-While Loop
          
-         if(!firstTime){                                                                                       // If it is not the first time placing a flag
+         /*if(!firstTime){                                                                                       // If it is not the first time placing a flag
             printBoard();                                                                                      // Call to method printBoard
          }
          else{                                                                                                 // Not the first time in the loop
             firstTime = false;                                                                                 // Sets the value of firstTime
-         }
+         }*/
          
-         System.out.printf("(Flag placement) Please enter the coordinate (type \"done\" to return to normal): ");
-         coordinate = input.nextLine();                                                                        // Sets the value of coordinate
+         //System.out.printf("(Flag placement) Please enter the coordinate (type \"done\" to return to normal): ");
+         //coordinate = input.nextLine();                                                                        // Sets the value of coordinate
          
          if(possiblyValid(coordinate)){                                                                        // Making sure the coordinate entered is within the bounds of the array
             
@@ -382,14 +389,15 @@ public class graphicalLogicGameBoard{                                           
                gameBoard[row][column] = "F";                                                                   // Sets the value of gameboard at the index of row and column
                flagsAdded -= 1;                                                                                // Subtracts from the value of flagsAdded
             }
-            else{
+            /*else{
                System.out.println("You can't place a flag here");                                              // Prints out to the user
                firstTime = true;                                                                               // Sets the value of firstTime to true
-            }
+            }*/
+            firstTime = false;
          }
          
       }
-      while(!coordinate.equals("done"));                                                                       // Conditional for do-while loop
+      while(firstTime);                                                                       // Conditional for do-while loop
       
       
    }
@@ -498,8 +506,10 @@ public class graphicalLogicGameBoard{                                           
             // this is not the case
             if(secretBoard[row][column].equals("M") && !gameBoard[row][column].equals("F")){                   // If the user accidentally encountered a mine
                revealedPieces = gameBoard.length * gameBoard[0].length;                                        // Sets the value of revealedPieces
-               System.out.println("\nYou have hit a mine!!!");                                                 // Prints out to the user
+               //System.out.println("\nYou have hit a mine!!!");                                                 // Prints out to the user
                gameBoard[row][column] = secretBoard[row][column];                                              // Sets the value in gameBoard at the index of row and column
+               
+               hitThatMine();                                                                                  // Call to method hitThatMine
                break;                                                                                          // Breaks out of the while loop
             }
             if(gameBoard[row][column].equals("*")){
@@ -522,6 +532,43 @@ public class graphicalLogicGameBoard{                                           
       this.firstSelection = false;                                                                             // Sets the value of firstSelection
    }
    
+   
+   
+   
+   /*
+      * GETTER Method to obtain the value of the private boolean wonGame
+   */
+   public boolean getWonGame(){                                                                                // GETTER METHOD
+      return wonGame;                                                                                          // Returns the value of wonGame
+   }
+   
+   
+   
+   /*
+      * SETTER METHOD to change the value of the private boolean wonGame
+   */
+   public void didWeWin(){                                                                                     // SETTER METHOD
+      this.wonGame = true;                                                                                     // Sets the value of wonGame
+   }
+   
+   
+   
+   /*
+      * SETTER METHOD to change the value of the private boolean hitMine
+   */
+   public void hitThatMine(){                                                                                  // SETTER METHOD
+      this.hitMine = true;                                                                                     // Sets the value of hitMine
+   }
+   
+   
+   
+   
+   /*
+      * GETTER Method to obtain the value of the private boolean hitMine
+   */
+   public boolean getHitMine(){                                                                                // GETTER METHOD
+      return hitMine;                                                                                          // Returns the value of firstSelection
+   }
    
    
    
@@ -726,6 +773,11 @@ public class graphicalLogicGameBoard{                                           
    public boolean gameOver(){                                                                                  // Method Block
       
       if(numMines + revealedPieces >= (gameBoard.length * gameBoard[0].length)){                               // If statement
+         
+         if(!getHitMine()){                                                                                      // If we won the game
+            didWeWin();                                                                                        // Call to Method didWeWin
+         }
+         //System.out.println("I am about to return true");
          return true;                                                                                          // Returns true to the user
       }
       else{                                                                                                    // Else statement

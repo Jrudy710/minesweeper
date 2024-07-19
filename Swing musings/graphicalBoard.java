@@ -11,6 +11,10 @@
    * Right click still needs to be implemented for flag placement and I need to make sure that the game over function is still
    * working properly once again so that it suits the graphical implementation. But seeing as how I've really only spent like 
    * 2-3 hours on this it's a good amount of progress. 
+* 7/17/2024 - Fixed a bug created when trying to show a space with no mines around it. Also added in the right click method for
+   * the flag placement so that works correctly now. Now all that's left should just be to add the instructions and for the 
+   * conditions that are used to determine when the game is over.
+* 7/19/2024 - Added in the conditions for when the user wins. Now all that has to be done is just an instructional explaining the rules
 */
 
 import javax.swing.JFrame;                                                                                                             // Imports the Java Swing JFrame capabilities
@@ -61,8 +65,10 @@ public class graphicalBoard extends graphicalLogicGameBoard{
       }
    });
    
-   public graphicalBoard(){                                                                                                            // No argument constructor 
-      super(14, 18);                                                                                                                         // Call to parent constructor
+   public graphicalBoard(int row, int column){                                                                                         // No argument constructor 
+      
+      
+      super(row, column);                                                                                                              // Call to parent constructor
       
       timeLabel.setText(seconds_string);                                                                                               // Sets the text of timeLabel
       
@@ -76,14 +82,14 @@ public class graphicalBoard extends graphicalLogicGameBoard{
       board.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);                                                                            // Sets the Default Close Operation of board
       board.setBounds(p.x / 2, p.y / 6, 650, 650);                                                                                     // Setting the bounds of board
    
-      makeBoard(board);                                                                                                                // Calls to method makeBoard
-      playerTimer.start();
-   
-      
+      makeBoard(board);                                                                                                                // Calls to method makeBoard      
 
       board.setResizable(false);                                                                                                       // Fixes the size of the JFrame
       board.setVisible(true);                                                                                                          // Setting the visibility of the JFrame to true
+      playerTimer.start();                                                                                                             // Starts the timer
+      beginningMessage();
       
+      playerTimer.start();   
    }
    
    
@@ -112,7 +118,7 @@ public class graphicalBoard extends graphicalLogicGameBoard{
       JLabel blank = new JLabel("                              ");                                                                     // Defines blank
       
       
-      player.setText("Number of Flags left to add: " + flagsAdded);                                                                    // Sets the text of player
+      player.setText("Number of Flags left to place: " + flagsAdded);                                                               // Sets the text of player
       
       theTop.add(player);                                                                                                           // Adds player to theTop
       
@@ -143,21 +149,31 @@ public class graphicalBoard extends graphicalLogicGameBoard{
             @Override
             public void mousePressed(MouseEvent e) {
                 JButton button = (JButton) e.getSource();
-                if (SwingUtilities.isLeftMouseButton(e)) {
-                    System.out.println("Left button clicked on " + button.getActionCommand());
+                if(SwingUtilities.isLeftMouseButton(e)){
+                    //System.out.println("Left button clicked on " + button.getActionCommand());
                     coordin = button.getActionCommand();
                     
                     
                     if(!sentinal){
-                     placeSelection(coordin);
-                     refresh();
-                     printBoard();
-                     sentinal = true;
+                        placeSelection(coordin);
+                        refresh();
+                        //printBoard();
+                        sentinal = true;
                     }
                     
                     // Handle left-click behavior
-                } else if (SwingUtilities.isRightMouseButton(e)) {
-                    System.out.println("Right button clicked on " + button.getActionCommand());
+                }
+                else if(SwingUtilities.isRightMouseButton(e)){
+                  //System.out.println("Right button clicked on " + button.getActionCommand());
+                  
+                  coordin = button.getActionCommand();
+                    
+                  if(!sentinal){
+                     flagPlacementTime(coordin);
+                     refresh();
+                     //printBoard();
+                     sentinal = true;
+                  }
                     // Handle right-click behavior
                 }
             }
@@ -168,12 +184,23 @@ public class graphicalBoard extends graphicalLogicGameBoard{
          for(int column = 0; column < colLength; column++){                                                                                    // Nested For Loop
             buttonArray[row][column] = new JButton(gameBoard[row][column]);
             buttonArray[row][column].setMargin(new Insets(0, 0, 0, 0));
-            if(!gameBoard[row][column].equals("*")){
-               buttonArray[row][column].setEnabled(false);
-            }
-            else if(gameBoard[row][column].equals("*")){
+            
+            if(gameBoard[row][column].equals("*")){
                buttonArray[row][column].setText("");
             }
+            else{
+               if(!gameBoard[row][column].equals("F")){
+                  buttonArray[row][column].setEnabled(false);
+               }
+               
+               if(gameBoard[row][column].equals("0")){
+                  buttonArray[row][column].setText("");
+               }
+               
+               
+            }
+            
+            
             
             buttonArray[row][column].setActionCommand(makeCoordinate(row, column));
             buttonArray[row][column].addMouseListener(mouseListener);
@@ -188,6 +215,7 @@ public class graphicalBoard extends graphicalLogicGameBoard{
    }
    
    public void refresh(){
+      
       board.setVisible(false);
       timeLabel.setText(seconds_string);                                                                                               // Sets the text of timeLabel
       
@@ -207,11 +235,50 @@ public class graphicalBoard extends graphicalLogicGameBoard{
 
       board.setResizable(false);                                                                                                       // Fixes the size of the JFrame
       board.setVisible(true);                                                                                                          // Setting the visibility of the JFrame to true
+      
+      if(gameOver()){                                                                                                                  // If the game is over   
+         if(getWonGame() || getHitMine()){                                                                                             // If the game is over
+            playerTimer.stop();                                                                                                        // Stops the timer
+            endingMessage();                                                                                                           // Displays the ending message to the user
+         }
+      }
    }
    
-   public static void main(String[] args){
+   
+   /* 
+      * This is the message that will be shown at the end of the game whether 
+      * the user has hit a mine or whether the user has won the game
+   */ 
+   public void endingMessage(){                                                                                                        // Method Block
       
-      new graphicalBoard();
+      Frame finalMessage = new JFrame("Message to player");                                                                            // Defines finalMessage
       
+      if(getWonGame()){                                                                                                                // If the user won the game
+         
+         JOptionPane.showMessageDialog(finalMessage, "You won!!!");                                                                    // Displays the Message to the user                                                   
+      }
+      else{                                                                                                                            // Else Block
+         
+         JOptionPane.showMessageDialog(finalMessage, "You have hit a mine!!!");                                                        // Displays the Message to the user
+      }
+      
+      System.exit(0);                                                                                                                  // Exits the Program
    }
+   
+   
+   /* 
+      * This is the message that will be shown at the beginning of the game whether 
+      * the user has hit a mine or whether the user has won the game
+   */ 
+   public void beginningMessage(){                                                                                                     // Method Block
+      
+      Frame firstMessage = new JFrame("Message to player");                                                                            // Defines firstMessage
+      
+      String theMessage = "Welcome to minesweeper!!! Click on a space to reveal all the places where there are not mines. \n";         // Defines theMessage
+      
+      theMessage += "You will right click to place and remove flags where you think mines could be. Good Luck!!!";                     // Adds to the value of theMessage
+      
+      JOptionPane.showMessageDialog(firstMessage, theMessage);                                                                         // Displays the Message to the user      
+   }
+   
 }
